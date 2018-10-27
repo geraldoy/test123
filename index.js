@@ -145,7 +145,7 @@ router.post('/transfers', function(req, res) {
     feeAssetId: 'CeNAju9EtKveEHutRqCjvy1xkhuSgxu8vn6qidQa62s6',
     fee: 1,
     // 140 bytes of data (it's allowed to use Uint8Array here)
-    attachment: '',
+    attachment: req.body.attach,
     timestamp: Date.now()
   };
   Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
