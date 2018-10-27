@@ -54,7 +54,7 @@ router.get("/encrypt/:p/:phrase",function(req,res){
   //const password = '0123456789';
   const encrypted = seed.encrypt(password);
 
-  res.send(encrypted); // 'U2FsdGVkX1+5TpaxcK/eJyjht7bSpjLYlSU8gVXNapU3MG8xgWm3uavW37aPz/KTcROK7OjOA3dpCLXfZ4YjCV3OW2r1CCaUhOMPBCX64QA/iAlgPJNtfMvjLKTHZko/JDgrxBHgQkz76apORWdKEQ=='
+  res.send('{"encryted":"'+encrypted+'"}'); // 'U2FsdGVkX1+5TpaxcK/eJyjht7bSpjLYlSU8gVXNapU3MG8xgWm3uavW37aPz/KTcROK7OjOA3dpCLXfZ4YjCV3OW2r1CCaUhOMPBCX64QA/iAlgPJNtfMvjLKTHZko/JDgrxBHgQkz76apORWdKEQ=='
 
   //const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
   //console.log(restoredPhrase); // 'hole law front bottom then mobile fabric under horse drink other member work twenty boss '
@@ -129,7 +129,7 @@ router.get("/getlist/:p/:addr",function(req,res){
       res.send(txList);
     });
   } else {
-    res.send('{ Error P.}');
+    res.send('{"Error":"P."}');
   }
 });
 
