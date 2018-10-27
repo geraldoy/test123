@@ -4,6 +4,10 @@ var router = express.Router();
 var path = __dirname + '/views/';
 const WavesAPI = require('waves-api');
 
+var bodyParser = require('body-parser');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+
 router.use(function (req,res,next) {
   console.log("/" + req.method);
   next();
@@ -117,6 +121,36 @@ router.get("/transfer/:p/:encr/:rec/:amount",function(req,res){
   };
   Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
     console.log(responseData);
+    res.send(responseData);
+  });
+});
+
+router.post('/transfers', function(req, res) {
+  const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+  const password = req.body.p;
+  const encrypted = req.body.encr;
+  const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
+  const seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
+  //const seed = Waves.Seed.fromExistingPhrase('auto filter denial blame lunar become album december lady flock net fly song guard draft');
+
+  const transferData = {
+    // An arbitrary address; mine, in this example
+    //recipient: '3PJY1y5uAcN1P8nFJqdSLCeHwDGWfMrytaS',
+    recipient: req.body.rec,
+    // ID of a token, or WAVES
+    assetId: 'CeNAju9EtKveEHutRqCjvy1xkhuSgxu8vn6qidQa62s6',
+    // The real amount is the given number divided by 10^(precision of the token)
+    amount: req.body.amount,
+    // The same rules for these two fields
+    feeAssetId: 'CeNAju9EtKveEHutRqCjvy1xkhuSgxu8vn6qidQa62s6',
+    fee: 1,
+    // 140 bytes of data (it's allowed to use Uint8Array here)
+    attachment: '',
+    timestamp: Date.now()
+  };
+  Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
+    console.log(responseData);
+    res.send(responseData);
   });
 });
 
