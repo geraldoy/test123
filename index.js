@@ -167,6 +167,38 @@ router.get("/getlist/:p/:addr",function(req,res){
   }
 });
 
+router.get("/getrate/:p/:currency",function(req,res){
+  var p = req.params.p;
+  if (p == "1") {
+    var c = req.params.currency;
+    if (c == 'BRL')
+      res.send('{"rate":"30"}');
+    else if (c == 'USD')
+      res.send('{"rate":"115"}');
+    else if (c == 'EUR')
+      res.send('{"rate":"128"}');
+    else if (c == 'BTC')
+      res.send('{"rate":"690000"}');
+    else if (c == 'ETH')
+      res.send('{"rate":"23588"}');
+    else if (c == 'WAVES')
+      res.send('{"rate":"230"}');
+    else
+      res.send('{"rate":"0"}');
+  } else {
+    res.send('{"Error":"P."}');
+  }
+});
+
+router.get("/neworder/:p/:address/:email/:amount1/:rate/:amount2",function(req,res){
+  // Add order do Parse and return the order number.
+});
+
+router.get("/confirmorder/:p/:order/:address/:amount",function(req,res){
+  // Mark order as payed and save the payment
+  // Transfer the Limes to Address
+});
+
 app.use("/",router);
 
 app.use("*",function(req,res){
@@ -175,6 +207,11 @@ app.use("*",function(req,res){
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
+});
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
 });
 
 app.listen(8000, () => {
