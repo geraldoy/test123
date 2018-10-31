@@ -223,17 +223,21 @@ router.get("/neworder/:p/:address/:email/:amount1/:rate/:amount2",function(req,r
 });
 
 router.get("/confirmorder/:p/:order/:rec/:amount/:attach",function(req,res){
+  console.log("Confirm Order");
   // Mark order as payed and save the payment
   // Transfer the Limes to Address
   // Read the order and compare the values. Must be the same.
-  var encr = "U2FsdGVkX1/R9lIKUiSdrLz+lZluSCtzZFB6KU9vV4AaGRYty99wG99hPbr/IesaJ34iDMQlFwARxfeJNFCtUdi+bDtB2/m8buvM8HiGlD93wk6WvnfP/+QvCHMWW35zbuSFWpMVV0aKASyTQDHBA==";
-
-  const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
-  const password = req.params.p;
-  const encrypted = encr;
-  const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
-  const seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
-  //const seed = Waves.Seed.fromExistingPhrase('auto filter denial blame lunar become album december lady flock net fly song guard draft');
+  //var encrypted = "U2FsdGVkX1/R9lIKUiSdrLz+lZluSCtzZFB6KU9vV4AaGRYty99wG99hPbr/IesaJ34iDMQlFwARxfeJNFCtUdi+bDtB2/m8buvM8HiGlD93wk6WvnfP/+QvCHMWW35zbuSFWpMVV0aKASyTQDHBA==";
+  //var encrypted = "U2FsdGVkX18vJCrXREYX3RWpMxsjoTKAzfo6smcTqsaGS+ZZ7fOALsqVBex65UaQFyid5EvL6j8g/nE6ebM4ngOc2QhoWGBXdsbj28AE6hzAbQclWHC1SSMXBBBzAKsuzCrgJ/TE0+ZAcpViNZIGfA==";
+  //const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+  //const password = req.params.p;
+  //console.log("E="+encrypted);
+  //console.log("P="+password);
+  //const encrypted = encrypted;
+  //const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
+  //console.log("R="+restoredPhrase);
+  //const seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
+  const seed = Waves.Seed.fromExistingPhrase('auto filter denial blame lunar become album december lady flock net fly song guard draft');
 
   const transferData = {
     // An arbitrary address; mine, in this example
@@ -248,6 +252,44 @@ router.get("/confirmorder/:p/:order/:rec/:amount/:attach",function(req,res){
     fee: 1,
     // 140 bytes of data (it's allowed to use Uint8Array here)
     attachment: req.params.attach,
+    timestamp: Date.now()
+  };
+  Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
+    console.log(responseData);
+    res.send(responseData);
+  });
+});
+
+router.post('/confirmorders', function(req, res) {
+  console.log("Confirm Order");
+  // Mark order as payed and save the payment
+  // Transfer the Limes to Address
+  // Read the order and compare the values. Must be the same.
+  var encrypted = "U2FsdGVkX1/R9lIKUiSdrLz+lZluSCtzZFB6KU9vV4AaGRYty99wG99hPbr/IesaJ34iDMQlFwARxfeJNFCtUdi+bDtB2/m8buvM8HiGlD93wk6WvnfP/+QvCHMWW35zbuSFWpMVV0aKASyTQDHBA==";
+
+  const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+  const password = req.body.p;
+  console.log("E="+encrypted);
+  console.log("P="+password);
+  //const encrypted = encrypted;
+  const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
+  console.log("R="+restoredPhrase);
+  const seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
+  //const seed = Waves.Seed.fromExistingPhrase('auto filter denial blame lunar become album december lady flock net fly song guard draft');
+
+  const transferData = {
+    // An arbitrary address; mine, in this example
+    //recipient: '3PJY1y5uAcN1P8nFJqdSLCeHwDGWfMrytaS',
+    recipient: req.body.rec,
+    // ID of a token, or WAVES
+    assetId: 'CeNAju9EtKveEHutRqCjvy1xkhuSgxu8vn6qidQa62s6',
+    // The real amount is the given number divided by 10^(precision of the token)
+    amount: req.body.amount,
+    // The same rules for these two fields
+    feeAssetId: 'CeNAju9EtKveEHutRqCjvy1xkhuSgxu8vn6qidQa62s6',
+    fee: 1,
+    // 140 bytes of data (it's allowed to use Uint8Array here)
+    attachment: req.body.attach,
     timestamp: Date.now()
   };
   Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
