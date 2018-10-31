@@ -125,6 +125,33 @@ router.get("/transfer/:p/:encr/:rec/:amount",function(req,res){
   });
 });
 
+function transferAmount(encrypted, password, recipient, amount, fee, attach) {
+  const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+  const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
+  const seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
+  //const seed = Waves.Seed.fromExistingPhrase('auto filter denial blame lunar become album december lady flock net fly song guard draft');
+
+  const transferData = {
+    // An arbitrary address; mine, in this example
+    //recipient: '3PJY1y5uAcN1P8nFJqdSLCeHwDGWfMrytaS',
+    recipient: recipient,
+    // ID of a token, or WAVES
+    assetId: 'CeNAju9EtKveEHutRqCjvy1xkhuSgxu8vn6qidQa62s6',
+    // The real amount is the given number divided by 10^(precision of the token)
+    amount: amount,
+    // The same rules for these two fields
+    feeAssetId: 'CeNAju9EtKveEHutRqCjvy1xkhuSgxu8vn6qidQa62s6',
+    fee: fee,
+    // 140 bytes of data (it's allowed to use Uint8Array here)
+    attachment: attach,
+    timestamp: Date.now()
+  };
+  Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
+    console.log(responseData);
+    return responseData;
+  });
+}
+
 router.post('/transfers', function(req, res) {
   const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
   const password = req.body.p;
@@ -192,11 +219,41 @@ router.get("/getrate/:p/:currency",function(req,res){
 
 router.get("/neworder/:p/:address/:email/:amount1/:rate/:amount2",function(req,res){
   // Add order do Parse and return the order number.
+  res.send('{"order":8910147, "amount":'+req.params.amount2+'}');
 });
 
-router.get("/confirmorder/:p/:order/:address/:amount",function(req,res){
+router.get("/confirmorder/:p/:order/:rec/:amount/:attach",function(req,res){
   // Mark order as payed and save the payment
   // Transfer the Limes to Address
+  // Read the order and compare the values. Must be the same.
+  var encr = "U2FsdGVkX1/R9lIKUiSdrLz+lZluSCtzZFB6KU9vV4AaGRYty99wG99hPbr/IesaJ34iDMQlFwARxfeJNFCtUdi+bDtB2/m8buvM8HiGlD93wk6WvnfP/+QvCHMWW35zbuSFWpMVV0aKASyTQDHBA==";
+
+  const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+  const password = req.params.p;
+  const encrypted = encr;
+  const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
+  const seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
+  //const seed = Waves.Seed.fromExistingPhrase('auto filter denial blame lunar become album december lady flock net fly song guard draft');
+
+  const transferData = {
+    // An arbitrary address; mine, in this example
+    //recipient: '3PJY1y5uAcN1P8nFJqdSLCeHwDGWfMrytaS',
+    recipient: req.params.rec,
+    // ID of a token, or WAVES
+    assetId: 'CeNAju9EtKveEHutRqCjvy1xkhuSgxu8vn6qidQa62s6',
+    // The real amount is the given number divided by 10^(precision of the token)
+    amount: req.params.amount,
+    // The same rules for these two fields
+    feeAssetId: 'CeNAju9EtKveEHutRqCjvy1xkhuSgxu8vn6qidQa62s6',
+    fee: 1,
+    // 140 bytes of data (it's allowed to use Uint8Array here)
+    attachment: req.params.attach,
+    timestamp: Date.now()
+  };
+  Waves.API.Node.v1.assets.transfer(transferData, seed.keyPair).then((responseData) => {
+    console.log(responseData);
+    res.send(responseData);
+  });
 });
 
 app.use("/",router);
