@@ -64,6 +64,15 @@ router.get("/encrypt/:p/:phrase",function(req,res){
   //console.log(restoredPhrase); // 'hole law front bottom then mobile fabric under horse drink other member work twenty boss '
 });
 
+router.post("/decrypt", function(req,res) {
+  var encrypted = req.body.encr;
+  var password = req.body.p;
+  const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+  const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
+  console.log(restoredPhrase); // 'hole law front bottom then mobile fabric under horse drink other member work twenty boss '
+  res.send('{"phrase":"'+restoredPhrase+'"}');
+});
+
 router.get("/fromExistingPhrase/:p/:phrase",function(req,res){
   var password = req.params.p;
   var phrase = req.params.phrase;
@@ -153,10 +162,11 @@ function transferAmount(encrypted, password, recipient, amount, fee, attach) {
 }
 
 router.post('/transfers', function(req, res) {
+  var encrypted = req.body.encr;
+  var password = req.body.p;
   const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
-  const password = req.body.p;
-  const encrypted = req.body.encr;
   const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
+  console.log(restoredPhrase);
   const seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
   //const seed = Waves.Seed.fromExistingPhrase('auto filter denial blame lunar become album december lady flock net fly song guard draft');
 
@@ -227,17 +237,15 @@ router.get("/confirmorder/:p/:order/:rec/:amount/:attach",function(req,res){
   // Mark order as payed and save the payment
   // Transfer the Limes to Address
   // Read the order and compare the values. Must be the same.
-  //var encrypted = "U2FsdGVkX1/R9lIKUiSdrLz+lZluSCtzZFB6KU9vV4AaGRYty99wG99hPbr/IesaJ34iDMQlFwARxfeJNFCtUdi+bDtB2/m8buvM8HiGlD93wk6WvnfP/+QvCHMWW35zbuSFWpMVV0aKASyTQDHBA==";
-  //var encrypted = "U2FsdGVkX18vJCrXREYX3RWpMxsjoTKAzfo6smcTqsaGS+ZZ7fOALsqVBex65UaQFyid5EvL6j8g/nE6ebM4ngOc2QhoWGBXdsbj28AE6hzAbQclWHC1SSMXBBBzAKsuzCrgJ/TE0+ZAcpViNZIGfA==";
-  //const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
-  //const password = req.params.p;
+  var encrypted = "U2FsdGVkX1+ck+m1xJLQyewE4bXJqblQbT8Yll1f5FLXwODQF6KBI08aMlv5YklTmIVNKTrEZQ1Gu5hvUOE0QI31VUHxNJL+7WgQKArx8ISVH/i5sq9kB84fbMZANf3Elj9tPhZsbBP56k71zLAqxA==";
+  const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+  const password = req.params.p;
   //console.log("E="+encrypted);
   //console.log("P="+password);
-  //const encrypted = encrypted;
-  //const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
+  const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
   //console.log("R="+restoredPhrase);
-  //const seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
-  const seed = Waves.Seed.fromExistingPhrase('auto filter denial blame lunar become album december lady flock net fly song guard draft');
+  const seed = Waves.Seed.fromExistingPhrase(restoredPhrase);
+  //const seed = Waves.Seed.fromExistingPhrase('auto filter denial blame lunar become album december lady flock net fly song guard draft');
 
   const transferData = {
     // An arbitrary address; mine, in this example
@@ -265,7 +273,7 @@ router.post('/confirmorders', function(req, res) {
   // Mark order as payed and save the payment
   // Transfer the Limes to Address
   // Read the order and compare the values. Must be the same.
-  var encrypted = "U2FsdGVkX1/R9lIKUiSdrLz+lZluSCtzZFB6KU9vV4AaGRYty99wG99hPbr/IesaJ34iDMQlFwARxfeJNFCtUdi+bDtB2/m8buvM8HiGlD93wk6WvnfP/+QvCHMWW35zbuSFWpMVV0aKASyTQDHBA==";
+  var encrypted = "U2FsdGVkX1+ck+m1xJLQyewE4bXJqblQbT8Yll1f5FLXwODQF6KBI08aMlv5YklTmIVNKTrEZQ1Gu5hvUOE0QI31VUHxNJL+7WgQKArx8ISVH/i5sq9kB84fbMZANf3Elj9tPhZsbBP56k71zLAqxA==";
 
   const Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
   const password = req.body.p;
